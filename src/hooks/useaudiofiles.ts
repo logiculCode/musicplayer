@@ -15,6 +15,26 @@ export type AudioAsset = {
   uri: string;
 };
 
+// Folders to exclude — add or remove as needed
+const EXCLUDED_FOLDERS = [
+  "/Notifications/",
+  "/Ringtones/",
+  "/Alarms/",
+  "/Podcasts/",
+  "/Audiobooks/",
+  "/WhatsApp/", // WhatsApp voice notes & received audio
+  "/Android/media/", // app-specific media caches
+  "/Telegram/",
+  "/recordings/", // voice recorder apps
+  "/PTT/", // push-to-talk apps
+];
+
+function isExcluded(uri: string): boolean {
+  return EXCLUDED_FOLDERS.some((folder) =>
+    uri.toLowerCase().includes(folder.toLowerCase()),
+  );
+}
+
 export function useAudioFiles() {
   const [songs, setSongs] = useState<AudioAsset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,8 +59,6 @@ export function useAudioFiles() {
 
     loadAudioFiles();
   }, [permission?.granted]);
-
-  
 
   async function loadAudioFiles() {
     try {
@@ -68,7 +86,14 @@ export function useAudioFiles() {
         }),
       );
 
-      setSongs(mapped);
+      // Filter out excluded folders and very short clips (under 30s)
+      const filtered = mapped.filter((song) => {
+        if (isExcluded(song.uri)) return false;
+        if (song.duration > 0 && song.duration < 30_000) return false; // skip < 30 seconds
+        return true;
+      });
+
+      setSongs(filtered);
     } catch (e) {
       setError("Failed to load audio files.");
       console.error(e);

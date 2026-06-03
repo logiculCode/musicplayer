@@ -1,21 +1,23 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import React from "react";
 import { Images } from "@/assets/images";
+import { router } from "expo-router";
+import { AudioAsset } from "@/hooks/useaudiofiles";
 
-export default function MusicItem({thumbNail, id}:{thumbNail:any | null,id:string}) {
+export default function MusicItem({thumbNail, song, index}:{thumbNail:any | null,song:AudioAsset, index:number}) {
   return (
-    <View style={styles.main}>
+    <Pressable style={styles.main} onPress={() => router.push({pathname:'/pages/musicplayer', params:{song:JSON.stringify(song)}})}>
       <Image
-        source={thumbNail}
+        source={thumbNail?? Images.pain}
         style={{ aspectRatio: 1 / 1, width: 75, borderRadius: 5 }}
       />
       {/* Details */}
       <View style={styles.details}>
-        <Text>{id}</Text>
+        <Text>{song.title}</Text>
         <Text>Artist name</Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

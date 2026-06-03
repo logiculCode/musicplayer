@@ -6,6 +6,7 @@ export default function _layout() {
   return (
     <Stack>
         <Stack.Screen name='musicpage' />
+        <Stack.Screen name='musicplayer' options={{headerShown:false}}/>
     </Stack>
   )
 }
